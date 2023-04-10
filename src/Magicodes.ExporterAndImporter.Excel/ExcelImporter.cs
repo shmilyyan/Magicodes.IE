@@ -37,14 +37,13 @@ namespace Magicodes.ExporterAndImporter.Excel
         /// <param name="fileName"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentException">文件名必须填写! - fileName</exception>
-        public Task<ExportFileInfo> GenerateTemplate<T>(string fileName) where T : class, new()
+        public virtual Task<ExportFileInfo> GenerateTemplate<T>(string fileName) where T : class, new()
         {
             fileName.CheckExcelFileName();
             var isMultipleSheetType = false;
             var tableType = typeof(T);
             List<PropertyInfo> sheetPropertyList = new List<PropertyInfo>();
-            var sheetProperties = tableType.GetProperties()
-                .OrderBy(p => p.GetAttribute<ImporterHeaderAttribute>()?.ColumnIndex ?? 10000).ToArray();
+            var sheetProperties = tableType.GetSortedPropertyInfos();
 
             for (var i = 0; i < sheetProperties.Length; i++)
             {
@@ -82,13 +81,12 @@ namespace Magicodes.ExporterAndImporter.Excel
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns>二进制字节</returns>
-        public Task<byte[]> GenerateTemplateBytes<T>() where T : class, new()
+        public virtual Task<byte[]> GenerateTemplateBytes<T>() where T : class, new()
         {
             var isMultipleSheetType = false;
             var tableType = typeof(T);
             List<PropertyInfo> sheetPropertyList = new List<PropertyInfo>();
-            var sheetProperties = tableType.GetProperties()
-                .OrderBy(p => p.GetAttribute<ImporterHeaderAttribute>()?.ColumnIndex ?? 10000).ToArray();
+            var sheetProperties = tableType.GetSortedPropertyInfos();
 
             for (var i = 0; i < sheetProperties.Length; i++)
             {
@@ -130,7 +128,7 @@ namespace Magicodes.ExporterAndImporter.Excel
         /// <param name="labelingFilePath"></param>
         /// <param name="importResultCallback"></param>
         /// <returns></returns>
-        public Task<ImportResult<T>> Import<T>(string filePath, string labelingFilePath = null, Func<ImportResult<T>, ImportResult<T>> importResultCallback = null) where T : class, new()
+        public virtual Task<ImportResult<T>> Import<T>(string filePath, string labelingFilePath = null, Func<ImportResult<T>, ImportResult<T>> importResultCallback = null) where T : class, new()
         {
             filePath.CheckExcelFileName();
             using (var importer = new ImportHelper<T>(filePath, labelingFilePath))
@@ -147,9 +145,9 @@ namespace Magicodes.ExporterAndImporter.Excel
         /// <param name="filePath"></param>
         /// <param name="importResultCallback"></param>
         /// <returns></returns>
-        public Task<ImportResult<T>> Import<T>(string filePath, Func<ImportResult<T>, ImportResult<T>> importResultCallback = null) where T : class, new()
+        public virtual Task<ImportResult<T>> Import<T>(string filePath, Func<ImportResult<T>, ImportResult<T>> importResultCallback = null) where T : class, new()
         {
-            return Import<T>(filePath, importResultCallback: importResultCallback);
+            return Import<T>(filePath, labelingFilePath:null, importResultCallback: importResultCallback);
         }
 
 
@@ -159,9 +157,21 @@ namespace Magicodes.ExporterAndImporter.Excel
         /// <typeparam name="T"></typeparam>
         /// <param name="stream"></param>
         /// <returns></returns>
-        public Task<ImportResult<T>> Import<T>(Stream stream) where T : class, new()
+        public virtual Task<ImportResult<T>> Import<T>(Stream stream) where T : class, new()
         {
-            using (var importer = new ImportHelper<T>(stream))
+            return Import<T>(stream, default);
+        }
+
+        /// <summary>
+        /// 导入模型验证数据并返回错误标注Stream
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="stream"></param>
+        /// <param name="labelingFileStream"></param>
+        /// <returns></returns>
+        public Task<ImportResult<T>> Import<T>(Stream stream, Stream labelingFileStream) where T : class, new()
+        {
+            using (var importer = new ImportHelper<T>(stream, labelingFileStream))
             {
                 return importer.Import();
             }
@@ -175,7 +185,7 @@ namespace Magicodes.ExporterAndImporter.Excel
         /// <param name="bussinessErrorDataList">错误数据</param>
         /// <param name="msg">成功:错误数据返回路径,失败 返回错误原因</param>
         /// <returns></returns>
-        public bool OutputBussinessErrorData<T>(string filePath, List<DataRowErrorInfo> bussinessErrorDataList, out string msg) where T : class, new()
+        public virtual bool OutputBussinessErrorData<T>(string filePath, List<DataRowErrorInfo> bussinessErrorDataList, out string msg) where T : class, new()
         {
             filePath.CheckExcelFileName();
             using (var importer = new ImportHelper<T>(filePath, null))
@@ -192,7 +202,7 @@ namespace Magicodes.ExporterAndImporter.Excel
         /// <param name="bussinessErrorDataList">错误数据</param>
         /// <param name="fileByte">成功:错误数据返回文件流字节,失败 返回null</param>
         /// <returns></returns>
-        public bool OutputBussinessErrorData<T>(Stream stream, List<DataRowErrorInfo> bussinessErrorDataList, out byte[] fileByte) where T : class, new()
+        public virtual bool OutputBussinessErrorData<T>(Stream stream, List<DataRowErrorInfo> bussinessErrorDataList, out byte[] fileByte) where T : class, new()
         {
             using (var importer = new ImportHelper<T>())
             {
@@ -206,7 +216,7 @@ namespace Magicodes.ExporterAndImporter.Excel
         /// <typeparam name="T">Excel类</typeparam>
         /// <param name="filePath"></param>
         /// <returns>返回一个字典，Key为Sheet名，Value为Sheet对应类型的object装箱，使用时做强转</returns>
-        public async Task<Dictionary<string, ImportResult<object>>> ImportMultipleSheet<T>(string filePath) where T : class, new()
+        public virtual async Task<Dictionary<string, ImportResult<object>>> ImportMultipleSheet<T>(string filePath) where T : class, new()
         {
             filePath.CheckExcelFileName();
             if (string.IsNullOrEmpty(filePath))
@@ -247,7 +257,7 @@ namespace Magicodes.ExporterAndImporter.Excel
         /// <typeparam name="T">Excel类</typeparam>
         /// <param name="stream"></param>
         /// <returns>返回一个字典，Key为Sheet名，Value为Sheet对应类型的object装箱，使用时做强转</returns>
-        public async Task<Dictionary<string, ImportResult<object>>> ImportMultipleSheet<T>(Stream stream) where T : class, new()
+        public virtual async Task<Dictionary<string, ImportResult<object>>> ImportMultipleSheet<T>(Stream stream) where T : class, new()
         {
             var resultList = new Dictionary<string, ImportResult<object>>();
             var tableType = typeof(T);
@@ -285,7 +295,7 @@ namespace Magicodes.ExporterAndImporter.Excel
         /// <typeparam name="TSheet">Sheet类</typeparam>
         /// <param name="filePath"></param>
         /// <returns>返回一个字典，Key为Sheet名，Value为Sheet对应类型TSheet</returns>
-        public async Task<Dictionary<string, ImportResult<TSheet>>> ImportSameSheets<T, TSheet>(string filePath)
+        public virtual async Task<Dictionary<string, ImportResult<TSheet>>> ImportSameSheets<T, TSheet>(string filePath)
             where T : class, new() where TSheet : class, new()
         {
             filePath.CheckExcelFileName();
@@ -362,5 +372,6 @@ namespace Magicodes.ExporterAndImporter.Excel
             }
             return false;
         }
+
     }
 }

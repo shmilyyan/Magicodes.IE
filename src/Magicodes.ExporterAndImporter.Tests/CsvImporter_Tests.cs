@@ -1,6 +1,7 @@
 ﻿using Magicodes.ExporterAndImporter.Core;
 using Magicodes.ExporterAndImporter.Csv;
 using Magicodes.ExporterAndImporter.Tests.Models.Import;
+using Magicodes.IE.Tests.Models.Import;
 using Newtonsoft.Json;
 using Shouldly;
 using System.IO;
@@ -130,5 +131,19 @@ namespace Magicodes.ExporterAndImporter.Tests
 
         }
 
+        [Fact(DisplayName = "#393-ASCII编码问题")]
+        public async Task Issue393_Test()
+        {
+            //注意：关于ASCII文件编码的csv文件，需要将文件进行编码转换后才能导入，暂不考虑自动转码
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "TestFiles", "Import", "2022-04-02.csv");
+            var import = await Importer.Import<Issue393>(filePath);
+            import.ShouldNotBeNull();
+            if (import.Exception != null) _testOutputHelper.WriteLine(import.Exception.ToString());
+
+            if (import.RowErrors.Count > 0) _testOutputHelper.WriteLine(JsonConvert.SerializeObject(import.RowErrors));
+            import.HasError.ShouldBeFalse();
+            import.Data.ShouldNotBeNull();
+            import.Data.Count.ShouldBe(10);
+        }
     }
 }

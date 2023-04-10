@@ -29,12 +29,12 @@ namespace Magicodes.ExporterAndImporter.Core
         /// <summary>
         ///     头部字体大小
         /// </summary>
-        public float? HeaderFontSize { set; get; }
+        public float HeaderFontSize { set; get; }
 
         /// <summary>
         ///     正文字体大小
         /// </summary>
-        public float? FontSize { set; get; }
+        public float FontSize { set; get; }
 
         /// <summary>
         /// 一个Sheet最大允许的行数，设置了之后将输出多个Sheet
@@ -57,9 +57,14 @@ namespace Magicodes.ExporterAndImporter.Core
         public string Author { get; set; }
 
         /// <summary>
-        /// 头部筛选器
+        /// 列头筛选器
         /// </summary>
         public Type ExporterHeaderFilter { get; set; }
+
+        /// <summary>
+        /// 列头（集合）筛选器
+        /// </summary>
+        public Type ExporterHeadersFilter { get; set; }
 
         /// <summary>
         /// 是否禁用所有筛选器

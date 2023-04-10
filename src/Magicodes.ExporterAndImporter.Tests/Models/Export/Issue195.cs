@@ -11,8 +11,10 @@ namespace Magicodes.ExporterAndImporter.Tests.Models.Export
 
         [ExporterHeader(DisplayName = "性别")]
         public Sex Sex { get; set; }
+
+        public NullableSex? NullableSex { get; set; }
     }
-    enum Sex
+    enum Sex : byte
     {
         /// <summary>
         /// 男
@@ -28,5 +30,20 @@ namespace Magicodes.ExporterAndImporter.Tests.Models.Export
         girl = 2
     }
 
+    enum NullableSex
+    {
+        /// <summary>
+        /// 男
+        /// </summary>
+        [Display(Name = "男")]
+        [Description("男")]
+        boy = 1,
+        /// <summary>
+        /// 女
+        /// </summary>
+        [Display(Name = "女")]
+        [Description("女")]
+        girl = 2
+    }
 
 }

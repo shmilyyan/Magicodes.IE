@@ -1,5 +1,98 @@
 # Release Log
 
+## 2.7.4.3
+**2023.03.16**
+
+- 优化列名中不包含FieldErrors的key触发的异常信息
+- Excel模板导出，图片格式支持base64
+
+## 2.7.4.2
+**2023.01.04**
+
+- 重构表头排序
+
+## 2.7.4.1
+**2023.01.02**
+
+- Excel导出去除Task.FromResult包装，增加异步操作
+- 修改内部集合类，充分利用池化内存，降低内存分配
+
+## 2.7.4
+**2022.12.30**
+
+- Fix DateTime cell convert to Nullable<DateTime>，见pr [#475](https://github.com/dotnetcore/Magicodes.IE/pull/475)。
+
+## 2.7.3
+**2022.12.27**
+
+- 更新Haukcode.WkHtmlToPdfDotNet到1.5.86
+- tagetFrameworks移除net461
+
+## 2.7.2
+**2022.12.04**
+
+- 修复FontSize的Bug
+
+## 2.7.1
+**2022.12.01**
+
+- Magicodes.IE.EPPlus默认添加SkiaSharp.NativeAssets.Linux.NoDependencies包，以便于在Linux环境下使用
+- 导入验证支持将错误数据通过Stream的方式返回，感谢sampsonye （见pr[#466](https://github.com/dotnetcore/Magicodes.IE/pull/466)）
+
+## 2.7.0
+**2022.11.07**
+
+- 添加SkiaSharp
+- 移除SixLabors.Fonts
+- 感谢linch90的大力支持（具体见pr[#462](https://github.com/dotnetcore/Magicodes.IE/pull/462)） 
+- 部分方法改为虚方法
+
+## 2.7.0-beta
+**2022.10.27**
+
+-  使用SixLabors.ImageSharp替代System.Drawing，感谢linch90 （见pr[#454](https://github.com/dotnetcore/Magicodes.IE/pull/454)）
+
+## 2.6.9
+**2022.10.26**
+
+-  fix: 动态数据源导出到多个sheet的问题 （见[#449](https://github.com/dotnetcore/Magicodes.IE/issues/449)）
+
+## 2.6.8
+**2022.10.18**
+
+-  Excel模板导出添加API，以支持通过文件流模板：Task<byte[]> ExportBytesByTemplate<T>(T data, Stream templateStream)
+
+## 2.6.7
+**2022.10.12**
+
+- ExporterHeaderFilter支持修改列索引，以支持动态排序，需设置ExporterHeaderAttribute.ColumnIndex属性（注意不应修改Index属性），值范围为0~10000。设置错误会自动调整到相近的边界值。
+- 提供ExporterHeadersFilter筛选器，以支持批量修改列头。
+- 重构、优化列排序代码。
+
+## 2.6.5-beta1
+**2022.07.17**
+
+- 【修复】如果为动态类型导出，如datatable/dynamic/proxy等，会将原始数据转成字符串。
+- fix: 修复没有正确释放Graphics对象的问题 （见PR[#401](https://github.com/dotnetcore/Magicodes.IE/pull/401)）
+- feat(module: excel): Export of the byte type Enum value is allowed （见PR[#367](https://github.com/dotnetcore/Magicodes.IE/pull/367)）
+- feat(module: excel): The export can be of Nullable Enum type （见PR[#398](https://github.com/dotnetcore/Magicodes.IE/pull/398)）
+- fix(module: Excel): Excel ParseData
+
+## 2.6.4
+**2022.04.17**
+
+- 优化了ColumnIndex在生成模板时的实现，增加了ColumnIndex的单测（见PR[#385](https://github.com/dotnetcore/Magicodes.IE/pull/385)）。
+
+- 添加了NPOI的独立扩展包——Magicodes.IE.Excel.NPOI，以便于后续给用户提供更多的支持。目前仅提供了 SaveToExcelWithXSSFWorkbook 扩展方法。
+
+- 修复RequiredIfAttribute的Bug。
+
+- 修复导出JPG图片在Linux环境下可能引起的无限循环的问题（见PR[#396](https://github.com/dotnetcore/Magicodes.IE/pull/396)）。
+
+- Excel图片导入时，图片列支持为空。
+
+- 更新CsvHelper到最新版本，并修改相关代码。
+
 ## 2.6.3
 **2022.03.06**
 

@@ -100,17 +100,19 @@ namespace Magicodes.ExporterAndImporter.Tests
                 sheet.Cells["G2"].Text.Equals(DateTime.Parse(sheet.Cells["G2"].Text).ToString("yyyy-MM-dd"));
 
                 //单元格宽度测试
-                sheet.Column(7).Width.ShouldBe(100);
+                sheet.Column(sheet.Cells.First(p => p.Text == "Time3").End.Column).Width.ShouldBe(100);
+
+                sheet.Cells["I1"].Style.Font.Size.ShouldBe(18);
+                sheet.Cells["I2"].Style.Font.Size.ShouldBe(12);
+                sheet.Cells["A2"].Style.Font.Size.ShouldBe(12);
+                sheet.Cells["A1"].Style.Font.Size.ShouldBe(11);
 
                 sheet.Tables.Count.ShouldBe(1);
 
                 var tb = sheet.Tables.First();
                 tb.Columns.Count.ShouldBe(9);
                 tb.Columns.First().Name.ShouldBe("普通文本");
-
-                sheet.Tables.First();
-                tb.Columns.Count.ShouldBe(9);
-                tb.Columns[2].Name.ShouldBe("加粗文本");
+                tb.Columns[tb.Columns.Count - 1].Name.ShouldBe("加粗文本");
             }
         }
 
@@ -961,17 +963,17 @@ namespace Magicodes.ExporterAndImporter.Tests
             }
         }
 
-        
-        
+
+
         [Fact(DisplayName = "导出日期格式化#331")]
         public async Task DateTimeExport_Test()
         {
             IExporter exporter = new ExcelExporter();
-        
+
             var filePath = GetTestFilePath($"{nameof(Issue331)}.xlsx");
-        
+
             DeleteFile(filePath);
-        
+
             var data = GenFu.GenFu.ListOf<Issue331>(100);
 
             var datetime = new DateTime(2021, 10, 12, 14, 14, 14);
@@ -989,9 +991,9 @@ namespace Magicodes.ExporterAndImporter.Tests
                 pck.Workbook.Worksheets.First().Cells["D2"].Text.ShouldBe("");
                 pck.Workbook.Worksheets.First().Cells["E2"].Text.ShouldBe("14:14:14");
             }
-            
+
         }
-        
+
 
 
         [Fact(DisplayName = "单元格字体颜色设置数据导出测试")]
@@ -1019,5 +1021,29 @@ namespace Magicodes.ExporterAndImporter.Tests
             }
         }
 
+        [Fact(DisplayName = "Linux环境时导出JPG图片到Excel的测试", Timeout = 10000, Skip = "Skip")]
+        public async Task ExportWithJPG_Test()
+        {
+            var imagePath = Path.Combine(Directory.GetCurrentDirectory(), "TestFiles", "Images", "zero-DPI.Jpeg");
+            dynamic data = new ExpandoObject();
+            data.Datas = new List<ExpandoObject>() { };
+            dynamic row = new ExpandoObject();
+            row.Name = "好名字";
+            row.ImagePath = imagePath;
+            data.Datas.Add(row);
+
+            //模板路径
+            var tplPath = Path.Combine(Directory.GetCurrentDirectory(), "TestFiles", "ExportTemplates", "ZeroDPI.xlsx");
+            //创建Excel导出对象
+            IExportFileByTemplate exporter = new ExcelExporter();
+            //导出路径
+            var filePath = GetTestFilePath($"{nameof(ExportWithJPG_Test)}.xlsx");
+            if (File.Exists(filePath)) File.Delete(filePath);
+            //根据模板导出
+            await Task.Run(async () =>
+            {
+                await exporter.ExportByTemplate(filePath, data, tplPath);
+            });
+        }
     }
 }

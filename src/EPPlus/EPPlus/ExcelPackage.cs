@@ -42,7 +42,8 @@ using OfficeOpenXml.Encryption;
 using OfficeOpenXml.Utils.CompundDocument;
 using OfficeOpenXml.Compatibility;
 using System.Text;
-#if (Core)
+using System.Threading.Tasks;
+#if (Core||NET6_0_OR_GREATER)
 using Microsoft.Extensions.Configuration;
 #endif
 namespace OfficeOpenXml
@@ -522,7 +523,7 @@ namespace OfficeOpenXml
         private void Init()
         {
             DoAdjustDrawings = true;
-#if (Core)
+#if (Core||NET6_0_OR_GREATER)
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);  //Add Support for codepage 1252
 
             var build = new ConfigurationBuilder()
@@ -1126,6 +1127,38 @@ namespace OfficeOpenXml
             Stream.Close();
             return byRet;
         }
+
+        public Task<byte[]> GetAsByteArrayAsync()
+        {
+            return GetAsByteArrayAsync(true);
+        }
+
+        internal async Task<byte[]> GetAsByteArrayAsync(bool save)
+        {
+            if (save)
+            {
+                Workbook.Save();
+                _package.Save(_stream);
+               //await _package.SaveAsync(_stream);
+            }
+            byte[] byRet = new byte[Stream.Length];
+            long pos = Stream.Position;
+            Stream.Seek(0, SeekOrigin.Begin);
+            await Stream.ReadAsync(byRet, 0, (int)Stream.Length);
+
+            //Encrypt Workbook?
+            if (Encryption.IsEncrypted)
+            {
+                EncryptedPackageHandler eph = new EncryptedPackageHandler();
+                var ms = eph.EncryptPackage(byRet, Encryption);
+                byRet = ms.ToArray();
+            }
+
+            Stream.Seek(pos, SeekOrigin.Begin);
+            Stream.Close();
+            return byRet;
+        }
+
         /// <summary>
         /// Loads the specified package data from a stream.
         /// </summary>

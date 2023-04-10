@@ -19,23 +19,10 @@ Import and export general library, support Dto import and export, template expor
 
 **![General description](./docs/Magicodes.IE.en.png)**
 
-## Milestone
-
-|  #   |    Status     | Completion time | Milestone situation |
-| :--: | :-----------: | :------: | :----------------------------------------------------------: |
-| [3.0](https://github.com/dotnetcore/Magicodes.IE/issues?q=+is%3Aissue+milestone%3A2.5) | ☕In progress |2021-12-31| [To Do](https://github.com/dotnetcore/Magicodes.IE/milestone/7) |
-| [2.5](https://github.com/dotnetcore/Magicodes.IE/issues?q=+is%3Aissue+milestone%3A2.5) | 🚩Completed  |2020-10-30| [Completed](https://github.com/dotnetcore/Magicodes.IE/milestone/7) |
-| [2.4](https://github.com/dotnetcore/Magicodes.IE/issues?q=+is%3Aissue+milestone%3A2.4) | 🚩Completed |2020-09-30| [Completed](https://github.com/dotnetcore/Magicodes.IE/milestone/6) |
-| [2.3](https://github.com/dotnetcore/Magicodes.IE/issues?q=+is%3Aissue+milestone%3A2.3) | 🚩Completed |2020-06-30| [Completed](https://github.com/dotnetcore/Magicodes.IE/milestone/5) |
-| [2.2](https://github.com/dotnetcore/Magicodes.IE/issues?q=+is%3Aissue+milestone%3A2.2) | 🚩Completed |2020-04-31| [Completed](https://github.com/dotnetcore/Magicodes.IE/milestone/4) |
-| [2.1](https://github.com/dotnetcore/Magicodes.IE/issues?q=+is%3Aissue+milestone%3A2.1) | 🚩Completed |2020-03-15| [Completed](https://github.com/dotnetcore/Magicodes.IE/milestone/2?closed=1) |
-
 ### Azure DevOps
 - Build Status：[![Build Status](https://dev.azure.com/xinlaiopencode/Magicodes.IE/_apis/build/status/dotnetcore.Magicodes.IE?branchName=master)](https://dev.azure.com/xinlaiopencode/Magicodes.IE/_build/latest?definitionId=4&branchName=master)
 - Azure DevOps coverage (master):  ![Azure DevOps coverage (branch)](https://img.shields.io/azure-devops/coverage/xinlaiopencode/Magicodes.IE/4/master)
-- Azure DevOps coverage (develop):  ![Azure DevOps coverage (branch)](https://img.shields.io/azure-devops/coverage/xinlaiopencode/Magicodes.IE/4/develop)
 - Azure DevOps tests (master):  ![Azure DevOps tests (master)](https://img.shields.io/azure-devops/tests/xinlaiopencode/Magicodes.IE/4/master)
-- Azure DevOps tests (develop):  ![Azure DevOps tests (develop)](https://img.shields.io/azure-devops/tests/xinlaiopencode/Magicodes.IE/4/develop)
 
 For details, see: <https://dev.azure.com/xinlaiopencode/Magicodes.IE/_build?definitionId=4&_a=summary>
 
@@ -47,6 +34,7 @@ For details, see: <https://dev.azure.com/xinlaiopencode/Magicodes.IE/_build?defi
 |----------|:-------------|
 | **Magicodes.IE.Core** | **[![NuGet](https://buildstats.info/nuget/Magicodes.IE.Core)](https://www.nuget.org/packages/Magicodes.IE.Core)** |
 | **Magicodes.IE.Excel** | **[![NuGet](https://buildstats.info/nuget/Magicodes.IE.Excel)](https://www.nuget.org/packages/Magicodes.IE.Excel)**   |
+| **Magicodes.IE.Excel.NPOI** | **[![NuGet](https://buildstats.info/nuget/Magicodes.IE.Excel.NPOI)](https://www.nuget.org/packages/Magicodes.IE.Excel.NPOI)**   |
 | **Magicodes.IE.Excel.AspNetCore** | **[![NuGet](https://buildstats.info/nuget/Magicodes.IE.Excel.AspNetCore)](https://www.nuget.org/packages/Magicodes.IE.Excel.AspNetCore)**   |
 | **Magicodes.IE.Pdf** | **[![NuGet](https://buildstats.info/nuget/Magicodes.IE.Pdf)](https://www.nuget.org/packages/Magicodes.IE.Pdf)**   |
 | **Magicodes.IE.Word** | **[![NuGet](https://buildstats.info/nuget/Magicodes.IE.Word)](https://www.nuget.org/packages/Magicodes.IE.Word)**   |
@@ -59,6 +47,7 @@ For details, see: <https://dev.azure.com/xinlaiopencode/Magicodes.IE/_build?defi
 | **Magicodes.IE.Html.Abp** | **[![NuGet](https://buildstats.info/nuget/Magicodes.IE.Html.Abp)](https://www.nuget.org/packages/Magicodes.IE.Html.Abp)**   |
 | **Magicodes.IE.Pdf.Abp** | **[![NuGet](https://buildstats.info/nuget/Magicodes.IE.Pdf.Abp)](https://www.nuget.org/packages/Magicodes.IE.Pdf.Abp)**   |
 | **Magicodes.IE.Word.Abp** | **[![NuGet](https://buildstats.info/nuget/Magicodes.IE.Word.Abp)](https://www.nuget.org/packages/Magicodes.IE.Word.Abp)**   |
+| **Magicodes.IE.Stash** | **[![NuGet](https://buildstats.info/nuget/Magicodes.IE.Stash)](https://www.nuget.org/packages/Magicodes.IE.Stash)**   |
 
 ### **Note**
 
@@ -91,9 +80,10 @@ For details, see: <https://dev.azure.com/xinlaiopencode/Magicodes.IE/_build?defi
 - **Need to be used in conjunction with related import and export DTO models, support import and export through DTO and related characteristics. Configure features to control related logic and display results without modifying the logic code;**
 **![](./res/导入Dto.png "Import DTO")**
 - **Support various filters to support scenarios such as multi-language, dynamic control column display, etc. For specific usage, see unit test:**
-  - **Import column header filter (you can dynamically specify the imported column and imported value mapping relationship)**
-  - **Export column header filter (can dynamically control the export column, support dynamic export (DataTable))**
-  - **Import result filter (can modify annotation file)**
+  - **Import column header filter <IImportHeaderFilter>(you can dynamically specify the imported column and imported value mapping relationship)**
+  - **Export column header filter <IImportHeaderFilter>(can dynamically control the export column, support dynamic export (DataTable))**
+  - **Export column headers filter <IImportHeadersFilter>(can dynamically control the export column, support dynamic export (DataTable))**
+  - **Import result filter <IImportResultFilter>(can modify annotation file)**
 - **Export supports text custom filtering or processing;**
 - **Import supports automatic skipping of blank lines in the middle;**
 - **Import supports automatically generate import templates based on DTO, and automatically mark required items;**

@@ -16,16 +16,15 @@
 ## 目录
 
 1. [概述](#概述)
-2. [里程碑](#里程碑)
-3. [自动构建](#自动构建)
-4. [Nuget包](#NuGet包)
-5. [注意事项](#注意事项)
-6. [教程](#教程)
-7. [特点](#特点)
-8. [FAQ](https://github.com/dotnetcore/Magicodes.IE/issues?q=label%3Aquestion)
-9. [联系我们](#联系我们)
-10. [更新历史](./RELEASE.md)
-11. [友情赞助](#友情赞助)
+2. [自动构建](#自动构建)
+3. [Nuget包](#NuGet包)
+4. [注意事项](#注意事项)
+5. [教程](#教程)
+6. [特点](#特点)
+7. [FAQ](https://github.com/dotnetcore/Magicodes.IE/issues?q=label%3Aquestion)
+8. [联系我们](#联系我们)
+9. [更新历史](./RELEASE.md)
+10. [友情赞助](#友情赞助)
 
 ## 概述
 
@@ -36,23 +35,68 @@
 
 **![总体说明](./docs/Magicodes.IE.png)**
 
-## 里程碑
+## 功能清单
 
-|  #   |    状态     | 完成时间 |                          里程碑情况                           |
-| :--: | :-----------: | :------: | :----------------------------------------------------------: |
-| [3.0](https://github.com/dotnetcore/Magicodes.IE/issues?q=+is%3Aissue+milestone%3A3.0) | ☕进行中 |2021-12-31| [待办](https://github.com/dotnetcore/Magicodes.IE/milestone/3) |
-| [2.5](https://github.com/dotnetcore/Magicodes.IE/issues?q=+is%3Aissue+milestone%3A2.5) | 🚩已完成 |2020-10-30| [已完成](https://github.com/dotnetcore/Magicodes.IE/milestone/7) |
-| [2.4](https://github.com/dotnetcore/Magicodes.IE/issues?q=+is%3Aissue+milestone%3A2.4) | 🚩已完成 |2020-09-30| [已完成](https://github.com/dotnetcore/Magicodes.IE/milestone/6) |
-| [2.3](https://github.com/dotnetcore/Magicodes.IE/issues?q=+is%3Aissue+milestone%3A2.3) | 🚩已完成 |2020-06-30| [已完成](https://github.com/dotnetcore/Magicodes.IE/milestone/5) |
-| [2.2](https://github.com/dotnetcore/Magicodes.IE/issues?q=+is%3Aissue+milestone%3A2.2) | 🚩已完成 |2020-04-31| [已完成](https://github.com/dotnetcore/Magicodes.IE/milestone/4) |
-| [2.1](https://github.com/dotnetcore/Magicodes.IE/issues?q=+is%3Aissue+milestone%3A2.1) | 🚩已完成 |2020-03-15| [已完成](https://github.com/dotnetcore/Magicodes.IE/milestone/2?closed=1) |
+- [ ] Excel
+  - [ ] 导入
+    - [x] Dto导入
+      - [x] 导入配置
+        - [x] 指定Sheet名称(获取指定Sheet名称)，为空则自动获取第一个
+        - [x] 指定Sheet下标
+        - [x] 截止读取的列数（从1开始，如果已设置，则将支持空行以及特殊列）
+        - [x] 是否标注错误（默认为true）
+        - [x] Sheet顶部导入描述
+        - [x] Sheet顶部导入描述高度(换行可能无法自动设定高度,默认为Excel的默认行高)
+        - [x] 是否仅导出错误数据
+      - [x] 列配置
+        - [x] 列名
+        - [x] 批注
+        - [x] 作者
+        - [x] 自动过滤空格，默认启用
+        - [x] 处理所有的空格，包括中间空格
+        - [x] 格式化（仅用于模板生成）
+        - [x] 列索引，如果为0则自动计算
+        - [x] 是否忽略
+      - [x] 导入验证
+        - [x] DataAnnotations（MaxLength、Required...）
+        - [x] 是否允许重复
+      - [x] 值映射
+        - [x] bool
+        - [x] 枚举
+      - [x] 筛选器
+        - [x] 结果筛选器
+        - [x] 列头筛选器
+      - [x] 特殊数据列导入
+        - [x] 图片导入
+          - [x] 导入为Base64
+          - [x] 导入到临时目录
+          - [x] 导入到指定目录
+      - [x] 合并行导入
+      - [x] 错误处理
+        - [x] 模板校验错误
+        - [x] 数据验证错误
+        - [x] 异常
+        - [x] 导入Excel文件的错误标注
+      - [x] 生成导入模板
+        - [x] 数据验证提示
+        - [x] 必填项标注
+        - [x] 数据下拉项生成（仅枚举）
+        - [x] 生成批注
+        - [x] Excel内置数据验证，并支持自定义提示（默认未开启）
+          - [x] MaxLengthAttribute
+          - [x] MinLengthAttribute
+          - [x] StringLengthAttribute
+          - [x] RangeAttribute
+      - [x] 乱序导入（无需按列顺序导入）
+      - [x] **多Sheet导入**
+    - [ ] 动态导入（**Magicodes.IE.Stash**）
+  - [ ] 导出
 
 ## 自动构建
+
 - Build Status：[![Build Status](https://dev.azure.com/xinlaiopencode/Magicodes.IE/_apis/build/status/dotnetcore.Magicodes.IE?branchName=master)](https://dev.azure.com/xinlaiopencode/Magicodes.IE/_build/latest?definitionId=4&branchName=master)
 - Azure DevOps coverage (master):  ![Azure DevOps coverage (branch)](https://img.shields.io/azure-devops/coverage/xinlaiopencode/Magicodes.IE/4/master)
-- Azure DevOps coverage (develop):  ![Azure DevOps coverage (branch)](https://img.shields.io/azure-devops/coverage/xinlaiopencode/Magicodes.IE/4/develop)
 - Azure DevOps tests (master):  ![Azure DevOps tests (master)](https://img.shields.io/azure-devops/tests/xinlaiopencode/Magicodes.IE/4/master)
-- Azure DevOps tests (develop):  ![Azure DevOps tests (develop)](https://img.shields.io/azure-devops/tests/xinlaiopencode/Magicodes.IE/4/develop)
 
 具体见：<https://dev.azure.com/xinlaiopencode/Magicodes.IE/_build?definitionId=4&_a=summary>
 
@@ -64,6 +108,7 @@
 |----------|:-------------|
 | **Magicodes.IE.Core** | **[![NuGet](https://buildstats.info/nuget/Magicodes.IE.Core)](https://www.nuget.org/packages/Magicodes.IE.Core)** |
 | **Magicodes.IE.Excel** | **[![NuGet](https://buildstats.info/nuget/Magicodes.IE.Excel)](https://www.nuget.org/packages/Magicodes.IE.Excel)**   |
+| **Magicodes.IE.Excel.NPOI** | **[![NuGet](https://buildstats.info/nuget/Magicodes.IE.Excel.NPOI)](https://www.nuget.org/packages/Magicodes.IE.Excel.NPOI)**   |
 | **Magicodes.IE.Excel.AspNetCore** | **[![NuGet](https://buildstats.info/nuget/Magicodes.IE.Excel.AspNetCore)](https://www.nuget.org/packages/Magicodes.IE.Excel.AspNetCore)**   |
 | **Magicodes.IE.Pdf** | **[![NuGet](https://buildstats.info/nuget/Magicodes.IE.Pdf)](https://www.nuget.org/packages/Magicodes.IE.Pdf)**   |
 | **Magicodes.IE.Word** | **[![NuGet](https://buildstats.info/nuget/Magicodes.IE.Word)](https://www.nuget.org/packages/Magicodes.IE.Word)**   |
@@ -76,6 +121,7 @@
 | **Magicodes.IE.Html.Abp** | **[![NuGet](https://buildstats.info/nuget/Magicodes.IE.Html.Abp)](https://www.nuget.org/packages/Magicodes.IE.Html.Abp)**   |
 | **Magicodes.IE.Pdf.Abp** | **[![NuGet](https://buildstats.info/nuget/Magicodes.IE.Pdf.Abp)](https://www.nuget.org/packages/Magicodes.IE.Pdf.Abp)**   |
 | **Magicodes.IE.Word.Abp** | **[![NuGet](https://buildstats.info/nuget/Magicodes.IE.Word.Abp)](https://www.nuget.org/packages/Magicodes.IE.Word.Abp)**   |
+| **Magicodes.IE.Stash** | **[![NuGet](https://buildstats.info/nuget/Magicodes.IE.Stash)](https://www.nuget.org/packages/Magicodes.IE.Stash)**   |
 
 ## **注意事项**
 
@@ -109,9 +155,10 @@
 - **需配合相关导入导出的DTO模型使用，支持通过DTO以及相关特性控制导入导出。配置特性即可控制相关逻辑和显示结果，无需修改逻辑代码；**
 **![](./res/导入Dto.png "导入Dto")**
 - **支持各种筛选器，支持依赖注入，以便支持多语言、动态控制列展示等场景，具体使用见单元测试：**
-  - **导入列头筛选器（可动态指定导入列、导入的值映射关系）**
-  - **导出列头筛选器（可动态控制导出列，支持动态导出（DataTable））**
-  - **导入结果筛选器（可修改标注文件）**
+  - **导入列头筛选器【IImportHeaderFilter】（可动态指定导入列、导入的值映射关系）**
+  - **导出列头筛选器【IImportHeaderFilter】（可动态控制导出列，支持动态导出（DataTable））**
+  - **导出列头集合筛选器【IImportHeadersFilter】（可动态控制导出列，支持动态导出（DataTable））**
+  - **导入结果筛选器【IImportResultFilter】（可修改标注文件）**
 - **导出支持文本自定义过滤或处理；**
 - **导入支持中间空行自动跳过；**
 - **导入支持自动根据 DTO 生成导入模板,针对必填项将自动标注；**
@@ -332,21 +379,6 @@ public DateTime Time3 { get; set; }
 
 - **<https://github.com/xin-lai>**
 - **<https://gitee.com/magicodes>**
-
-## 友情赞助
-
-### 服务内容
-
-<p><a href="https://item.taobao.com/item.htm?spm=a2oq0.12575281.0.0.50111deb3qGSAw&ft=t&id=648720741666" target="_blank">点此打开小店</a></p>
-
-服务内容如下：
-- 技术支持
-- 使用培训
-- 二次开发支持
-- 需求定制
-- 赞助（Github展示）
-
-**具体收费根据需求评估，所有收入的30%~60%（视具体工作量评估）捐赠给Magicodes.IE项目开源管理委员会以促进项目长期维护和迭代发展。所有收支均全部公开。**
 
 ### Code Contributors
 

@@ -24,13 +24,14 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Reflection;
 using System.Threading.Tasks;
-using DateTime = System.DateTime;
+using Magicodes.IE.Excel.Images;
+using SixLabors.ImageSharp;
+using ImageExtensions = Magicodes.IE.Excel.Images.ImageExtensions;
 
 namespace Magicodes.ExporterAndImporter.Excel.Utility
 {
@@ -56,9 +57,10 @@ namespace Magicodes.ExporterAndImporter.Excel.Utility
         /// <summary>
         /// </summary>
         /// <param name="stream"></param>
-        public ImportHelper(Stream stream)
+        public ImportHelper(Stream stream, Stream labelingFileStream)
         {
             Stream = stream;
+            LabelingFileStream = labelingFileStream;
         }
 
         /// <summary>
@@ -107,6 +109,7 @@ namespace Magicodes.ExporterAndImporter.Excel.Utility
         ///     标注文件路径
         /// </summary>
         public string LabelingFilePath { get; }
+        public Stream LabelingFileStream { get; set; }
 
         /// <summary>
         ///     导入结果
@@ -338,8 +341,8 @@ namespace Magicodes.ExporterAndImporter.Excel.Utility
         /// <param name="excelPackage"></param>
         internal virtual void LabelingError(ExcelPackage excelPackage)
         {
-            //如果源路径为空则不允许生成标注文件
-            if (string.IsNullOrWhiteSpace(FilePath))
+            //如果源路径为空且标注流也为空则不允许生成标注文件
+            if (string.IsNullOrWhiteSpace(FilePath) && LabelingFileStream == null)
             {
                 return;
             }
@@ -373,7 +376,11 @@ namespace Magicodes.ExporterAndImporter.Excel.Utility
 
                     foreach (var field in item.FieldErrors)
                     {
-                        var col = ImporterHeaderInfos.First(p => p.Header.Name == field.Key);
+                        var col = ImporterHeaderInfos.FirstOrDefault(p => p.Header.Name == field.Key);
+                        if (col == null)
+                        {
+                            throw new Exception($"'{field.Key}'.The column name does not exist!");
+                        }
                         var cell = worksheet.Cells[item.RowIndex, col.Header.ColumnIndex];
                         cell.Style.Font.Color.SetColor(Color.Red);
                         cell.Style.Font.Bold = true;
@@ -404,12 +411,16 @@ namespace Magicodes.ExporterAndImporter.Excel.Utility
                         excelRangeList[i].Copy(newWorksheet.Cells[i + 1, 1, i + 1, worksheet.Dimension.Columns]);
                     }
                 }
-
-                var ext = Path.GetExtension(FilePath);
-                var filePath = string.IsNullOrWhiteSpace(LabelingFilePath)
-                    ? FilePath.Replace(ext, "_" + ext)
-                    : LabelingFilePath;
-                excelPackage.SaveAs(new FileInfo(filePath));
+                if (LabelingFileStream == null)
+                {
+                    var ext = Path.GetExtension(FilePath);
+                    var filePath = string.IsNullOrWhiteSpace(LabelingFilePath)
+                        ? FilePath.Replace(ext, "_" + ext)
+                        : LabelingFilePath;
+                    excelPackage.SaveAs(new FileInfo(filePath));
+                    return;
+                }
+                excelPackage.SaveAs(LabelingFileStream);
             }
         }
 
@@ -661,10 +672,8 @@ namespace Magicodes.ExporterAndImporter.Excel.Utility
         protected virtual bool ParseHeader()
         {
             ImporterHeaderInfos = new List<ImporterHeaderInfo>();
-            var objProperties = typeof(T).GetProperties();
-            //var objProperties = typeof(T).GetProperties()
-            //    .OrderBy(p => p.GetAttribute<ImporterHeaderAttribute>()?.ColumnIndex ?? 10000)
-            //    .ToArray();
+            // var objProperties = typeof(T).GetProperties();
+            var objProperties = typeof(T).GetSortedPropertyInfos();
 
             if (objProperties.Length == 0) return false;
 
@@ -1085,9 +1094,10 @@ namespace Magicodes.ExporterAndImporter.Excel.Utility
                                     }
 
                                     var value = col.MappingValues[cellValue];
-
-                                    if (isEnum && isNullable && (value is int || value is short) &&
-                                        Enum.IsDefined(type, value))
+                                    
+                                    if (isEnum && isNullable && (value is int || value is short)
+                                        // && Enum.IsDefined(type, value)
+                                        )
                                     {
                                         SetValue(cell, dataItem, propertyInfo, value == null ? null : Enum.ToObject(type, value));
                                     }
@@ -1113,18 +1123,21 @@ namespace Magicodes.ExporterAndImporter.Excel.Utility
                                 if (col.ImportImageFieldAttribute != null)
                                 {
                                     var excelPicture = GetImage(worksheet, cell.Start.Row, cell.Start.Column);
-
-                                    var path = Path.Combine(col.ImportImageFieldAttribute.ImageDirectory, Guid.NewGuid() + "." + excelPicture.ImageFormat);
+                                    if (excelPicture == null)
+                                    {
+                                        continue;
+                                    }
+                                    var path = Path.Combine(col.ImportImageFieldAttribute.ImageDirectory, Guid.NewGuid() + "." + excelPicture.ImageFormat.FileExtensions.First());
                                     var value = string.Empty;
 
                                     switch (col.ImportImageFieldAttribute.ImportImageTo)
                                     {
                                         case ImportImageTo.TempFolder:
-                                            value = Extension.Save(excelPicture?.Image, path, excelPicture.ImageFormat);
+                                            value = excelPicture.Image.SaveTo(path);
                                             break;
 
                                         case ImportImageTo.Base64:
-                                            value = excelPicture.Image.ToBase64String(excelPicture.ImageFormat);
+                                            value = ImageExtensions.ToBase64String(excelPicture.Image, excelPicture.ImageFormat);
                                             break;
 
                                         default:
@@ -1429,8 +1442,15 @@ namespace Magicodes.ExporterAndImporter.Excel.Utility
 
                                         if (!DateTime.TryParse(cell.Text, out var date))
                                         {
-                                            AddRowDataError(rowIndex, col, $"{Resource.Value} {cell.Text} {Resource.PleaseFillInTheCorrectDateAndTimeFormat}");
-                                            break;
+                                            if (cell.Value is DateTime value)
+                                            {
+                                                date = value;
+                                            }
+                                            else
+                                            {
+                                                AddRowDataError(rowIndex, col, $"{Resource.Value} {cell.Text} {Resource.PleaseFillInTheCorrectDateAndTimeFormat}");
+                                                break;
+                                            }
                                         }
 
                                         SetValue(cell, dataItem, propertyInfo, date);

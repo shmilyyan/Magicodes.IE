@@ -6,10 +6,9 @@ using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
+using SixLabors.ImageSharp;
 using System.IO;
 using System.Linq;
-using System.Linq.Dynamic.Core;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -294,7 +293,7 @@ namespace Magicodes.ExporterAndImporter.Excel.Utility
                     {
                         var col = ImporterHeaderInfos.First(p => p.Header.Name == field.Key);
                         var cell = worksheet.Cells[item.RowIndex, col.Header.ColumnIndex];
-                        cell.Style.Font.Color.SetColor(Color.Red);
+                        cell.Style.Font.Color.SetColor(SixLabors.ImageSharp.Color.Red);
                         cell.Style.Font.Bold = true;
                         cell.AddComment(string.Join(",", field.Value), col.Header.Author);
                     }
@@ -414,10 +413,8 @@ namespace Magicodes.ExporterAndImporter.Excel.Utility
         protected virtual bool ParseImporterHeader()
         {
             ImporterHeaderInfos = new List<ImporterHeaderInfo>();
-            var objProperties = _importDataType.GetProperties();
-            //var objProperties = _importDataType.GetProperties()
-            //    .OrderBy(p => p.GetAttribute<ImporterHeaderAttribute>()?.ColumnIndex ?? 10000)
-            //    .ToArray();
+            // var objProperties = _importDataType.GetProperties();
+            var objProperties = _importDataType.GetSortedPropertyInfos();
             if (objProperties.Length == 0) return false;
 
             foreach (var propertyInfo in objProperties)
@@ -498,10 +495,8 @@ namespace Magicodes.ExporterAndImporter.Excel.Utility
         protected virtual bool ParseImporterHeader(Type sheetType)
         {
             ImporterHeaderInfos = new List<ImporterHeaderInfo>();
-            var objProperties = sheetType.GetProperties();
-            //var objProperties = sheetType.GetProperties()
-            //    .OrderBy(p => p.GetAttribute<ImporterHeaderAttribute>()?.ColumnIndex ?? 10000)
-            //    .ToArray();
+            // var objProperties = sheetType.GetProperties();
+            var objProperties = sheetType.GetSortedPropertyInfos();
             if (objProperties.Length == 0) return false;
 
             foreach (var propertyInfo in objProperties)
@@ -600,7 +595,7 @@ namespace Magicodes.ExporterAndImporter.Excel.Utility
                             ImporterHeaderInfos[i].Header.Author);
                     //如果必填，则列头标红
                     if (ImporterHeaderInfos[i].IsRequired)
-                        worksheet.Cells[importerAttribute.HeaderRowIndex, i + 1].Style.Font.Color.SetColor(Color.Red);
+                        worksheet.Cells[importerAttribute.HeaderRowIndex, i + 1].Style.Font.Color.SetColor(SixLabors.ImageSharp.Color.Red);
 
                     if (ImporterHeaderInfos[i].MappingValues.Count > 0)
                     {
@@ -623,7 +618,7 @@ namespace Magicodes.ExporterAndImporter.Excel.Utility
                 worksheet.Cells[worksheet.Dimension.Address].Style.Border.Top.Style = ExcelBorderStyle.Thin;
                 worksheet.Cells[worksheet.Dimension.Address].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
                 worksheet.Cells[worksheet.Dimension.Address].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                worksheet.Cells[worksheet.Dimension.Address].Style.Fill.BackgroundColor.SetColor(Color.DarkSeaGreen);
+                worksheet.Cells[worksheet.Dimension.Address].Style.Fill.BackgroundColor.SetColor(SixLabors.ImageSharp.Color.DarkSeaGreen);
             }
         }
 
@@ -680,8 +675,9 @@ namespace Magicodes.ExporterAndImporter.Excel.Utility
 
                                     var value = col.MappingValues[cellValue];
 
-                                    if (isEnum && isNullable && (value is int || value is short) &&
-                                        Enum.IsDefined(type, value))
+                                    if (isEnum && isNullable && (value is int || value is short) 
+                                        //&& Enum.IsDefined(type, value)
+                                        )
                                         propertyInfo.SetValue(dataItem,
                                             value == null ? null : Enum.ToObject(type, value));
                                     //propertyInfo.SetValue(dataItem,

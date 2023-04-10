@@ -12,10 +12,8 @@
 // ======================================================================
 
 using System;
-
-#if !NETSTANDARD2_0
-using System.Drawing;
-#endif
+using Magicodes.IE.Core;
+using SixLabors.ImageSharp;
 
 namespace Magicodes.ExporterAndImporter.Core
 {
@@ -28,7 +26,7 @@ namespace Magicodes.ExporterAndImporter.Core
     {
         /// <inheritdoc />
         public ExporterHeaderAttribute(string displayName = null, float fontSize = 11, string format = null,
-            bool isBold = true, bool isAutoFit = true, bool autoCenterColumn = false, int width = 0)
+            bool isBold = true, bool isAutoFit = true, bool autoCenterColumn = false, int width = 0, KnownColor fontColor = KnownColor.Empty)
         {
             DisplayName = displayName;
             FontSize = fontSize;
@@ -37,6 +35,10 @@ namespace Magicodes.ExporterAndImporter.Core
             IsAutoFit = isAutoFit;
             AutoCenterColumn = autoCenterColumn;
             Width = width;
+            if (fontColor != KnownColor.Empty)
+            {
+                FontColor = Color.Parse(fontColor.ToString("G"));
+            }
         }
 
         /// <summary>
@@ -47,7 +49,7 @@ namespace Magicodes.ExporterAndImporter.Core
         /// <summary>
         ///     字体大小
         /// </summary>
-        public float? FontSize { set; get; }
+        public float FontSize { set; get; }
 
         /// <summary>
         ///     是否加粗
@@ -97,6 +99,6 @@ namespace Magicodes.ExporterAndImporter.Core
         /// <summary>
         /// 字体颜色
         /// </summary>
-        public KnownColor FontColor { get; set; }
+        public Color? FontColor { get; set; }
     }
 }
